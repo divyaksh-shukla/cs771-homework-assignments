@@ -1,0 +1,169 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage{mlsubmit}
+\usepackage{float}
+
+\begin{document}
+
+\initmlsubmision{1} % assignment number
+{Divyaksh Shukla}   % your name
+{231110603}	% your roll number
+
+\begin{mlsolution}
+
+We need to minimise the below objective function with respect to $w_c$ and $\vM_c$. We start off by optmising the function with respect to $w_c$ and equate it to $0$
+
+\begin{align}
+& \frac{\partial}{\partial w_c} \left(\frac{1}{N_c}\sum_{x_n:y_n = c}{(x_n - w_c)^T\vM_c(x_n - w_c)} - log|\vM_c|\right) = 0\nonumber\\
+\implies & \frac{-1}{2N_c}\sum_{x_n:y_n = c}{\vM_c(x_n - w_c)} = 0\nonumber\\
+\implies & w_c = \sum_{x_n:y_n = c}{x_n}
+\end{align}
+
+Now with respect to $\vM_c$ and equating it to $0$ we get:
+
+\begin{align}
+& \frac{\partial}{\partial \vM_c} \left(\frac{1}{N_c}\sum_{x_n:y_n = c}{(x_n - w_c)^T\vM_c(x_n - w_c)} - log|\vM_c|\right) = 0\nonumber\\
+\implies & \frac{1}{N_c}\sum_{x_n:y_n = c}{(x_n - w_c)^T(x_n - w_c)} - \frac{-1}{|\vM_c|}{|\vM_c|}(\vM_c^{-1})^T = 0\nonumber\\
+\implies & \vM_c^{-1} = \frac{1}{N_c}\sum_{x_n:y_n = c}{(x_n - w_c)^T(x_n - w_c)}\label{q1:2}
+\end{align}
+
+Here the RHS of \ref{q1:2} is the covarianace matrix of $x_n$ and $w_c$ (assuming a uniform probability distribution of $x_n$). Thus, 
+\begin{align}
+    \implies & \vM_c^{-1} = Cov_{x\sim P(x)}\nonumber\\
+    \implies & \vM_c = Cov_{x\sim P(x)}^{-1}
+\end{align}
+
+
+% A vector symbol $\vb$, a symbol in blackboard font $\bR$, a symbol in calligraphic font $\cA$, \red{some} \green{colored} \blue{text}
+
+
+
+
+
+\end{mlsolution}
+
+\begin{mlsolution} 
+
+Consistency is defined when the error rate while testing is also at Bayes' optimal. Thus, we have also got a definite decision boundary.
+
+In a noise-free setting, with a sampled set of the population used for training, the decision boundary is decided by the sampled points and even if the training shows 0 error rate the decision boundary is not necessarily optimal. Thus, in a noise-free setting one-nearest neighbour algorithm is not consistent.
+
+
+\end{mlsolution}
+
+\begin{mlsolution}
+
+We can use the same Information Gain formula but replace Entropy with a cost function which measures co-linearity between points say Cosine similarity. Which means:
+$$
+IG = \frac{\lvert{S_1}\rvert}{\lvert{S}\rvert}Sim(S_1) + \frac{\lvert{S_2}\rvert}{\lvert{S}\rvert}Sim(S_2) - Sim(S)
+$$
+where
+$$
+Sim(D) = \sum_{i,j}^{|D|}{(y_i.y_j)}
+$$
+
+The node with the highest information gain will then be selected as a splitting attribute.
+
+\end{mlsolution}
+
+\begin{mlsolution}
+
+Let's start with the basic formula for linear regression to find $f(x_*)$
+
+\begin{align*}
+f(x_*) &= w^Tx_*\\
+       &= \left[ (\vX^T\vX)^{-1}\vX^Ty \right]x_*\\
+       &= (\vX^Ty)^T\left[(\vX^T\vX)^{-1}\right]^T x_*\\
+       &= y^T\vX\left[(\vX^T\vX)^{-1}\right]^T x_*
+\end{align*}
+Transposing on both sides. $f(x_*)$ is a scalar so its transpose will yield the same value.
+\begin{align} \label{q4:answer}
+f(x_*) &=  \left[x_*^T (\vX^T\vX)^{-1} \vX^T\right] y
+\end{align}
+
+Thus the left part of the RHS in (\ref{q4:answer}) corresponds to $w_n$ of the equation give in the question. This is similar to taking a dot product between the weight vector in linear regression and the test-point to obtain the weights of each training response.
+
+By doing a dot product we are essentially weighting the training response based on the similarity between the training data and test point. 
+
+This is quite different from the typical style of obtaining the test response by weighing the training responses based on the inverse of distance between training points and test point.
+\end{mlsolution}
+	
+\begin{mlsolution}
+
+$$
+L(w) = \sum_{n=1}^{N}{(y_n - w^Tx_n)^2}
+$$
+now let's write this equation in vector and matrix form to make the algebra easier. So $\sum{y_n} = \vy$ and $\sum{x_n} = \vX$.
+
+Let's also assume that $\Tilde{\vX} = \vX . \vM$ where $\vM$ is the matrix obtained by putting in 0 and 1 based on the Bernoulli distribution, with $p$ defining the probability of $1$ (include the datapoint) and $(1-p)$ defining the probability of $0$ (excluding the datapoint).
+
+Therefore, $\bE[\Tilde{X}] = pX$ and $cov(\Tilde{X}, \Tilde{X}) = p(1-p)\Gamma^2$, where $\Gamma$ is the covariance matrix of $M$, but as all the values are independent so it is just a diagonal matrix only carrying variance values.
+
+\begin{align*}
+L(w) &= (\vy^T - w^T\Tilde{\vX}^T)(\vy - \vX w)\\
+&= \bE[(\vy^T - w^T\Tilde{\vX}^T)(\vy - \vX w)]\\
+&= \bE[\vy^T\vy - 2\vy^T\Tilde{\vX}w + w^T\Tilde{\vX}^T\Tilde{\vX}w]\\
+&= \vy^T\vy - 2p\vy^T\vX w + w^T\bE[\Tilde{\vX}^T\Tilde{\vX}]w
+\end{align*}
+
+From $cov(\vM, \vM) = \bE[\vM\vM^T] - \bE[\vM]\bE[\vM]^T$ we get 
+\begin{align*}
+\implies \bE[L(w)] &= \vy^T\vy - 2p\vy^T\vX w + p^2w^T\vX^T\vX w + p(1-p)w^T\Gamma^2w\\
+&= (\vy^T - p w^T\vX^T)(\vy - p\vX w) + p(1-p)||\Gamma w||^2\\
+&= \sum_{n=1}^{N}{(y_n - w^T x_n)^2} + p(1-p)||\Gamma w||^2
+\end{align*}
+
+This is similar to $L_2$ regularized loss function where $\lambda = p(1-p)\Gamma^2$.
+
+\end{mlsolution}
+
+\begin{mlsolution}
+
+\begin{section}{Learning with Prototypes}
+    
+    We have a data of 4096 features (extracted from a deep learning model). Our task is to predict the class labels of the unseen datapoints.
+    \begin{enumerate}
+        \item We start off by first looking at the data
+        \item Then we compute the means of the 40 seen classes as $\mu_k$
+    \end{enumerate}
+
+    \begin{subsection}{Method 1 - Using class attributes similarity}
+        We compute the similarity between seen and unseen classes by taking the dot product between the class attribute vectors of the seen and unseen classes like below
+        \begin{align*}
+            similarity = A_{s}A_{u}^T
+        \end{align*}
+        Then the similarity values were normalised by dividing each value in the above similarity matrix by the sum of its row.
+        \begin{align*}
+            similarity_i = \frac{similarity_{i,j}}{\sum_{j=1}^{40}{similarity_{i,j}}}
+        \end{align*}
+        Then we can estimate the means of the unseen classes by:
+        \begin{align*}
+            unseen\ means = similarity*means\ seen
+        \end{align*}
+        This method gives an accuracy of 46.893\%.
+        
+    \end{subsection}
+    \begin{subsection}{Method 2 - Linear regression}
+        This method starts similar to Method 1 by computing the means of the seen classes. Then we perform linear regression between the class attribute values and the means to get a model to map class attributes to means. We then use this model to compute means of the unseen classes and give predictions.
+
+        In the linear regression we can regularize the model with a parameter $\lambda$. In this case the chosen values of $\lambda$ are: 0.01, 0.1, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10, 20, 50, 100. 
+
+        Then prediction accuracy is compared with values of $\lambda$ to get the optimal $\lambda$ value with the highest accuracy.
+
+        This model got highest accuracy of 73.722\% with an optimal $\lambda$ of 6.50.
+        
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\textwidth]{Figure_1.png}
+            \caption{Accuracy vs lambda. The left chart shows the accuracy score compared to each value of lambda on a linear scale, while the right chart shows lambda on a log scale. The optimal lambda is marked with a vertical blue line}
+            \label{fig:acc-vs-lambda}
+        \end{figure}
+        \end{subsection}
+    \end{section}
+    
+
+
+\end{mlsolution}
+
+
+\end{document}

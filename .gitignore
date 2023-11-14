@@ -1,0 +1,15 @@
+# Removing data files
+*.zip
+*.npy
+**/data/*
+
+!**/data/*.py
+!**/data/*.ipynb
+
+# Ignoring build files of latex
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.gz
