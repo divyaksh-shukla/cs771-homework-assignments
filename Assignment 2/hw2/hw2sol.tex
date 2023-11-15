@@ -28,7 +28,21 @@
 
 \begin{mlsolution} 
 
-My solution to problem 2
+As $z_n \in \mathop{\mathbb{R}}$ is a linear transformation of $\vx_n$ and $\vw$ we can write:
+$$z_n=\vw^T\vx_n$$
+We need to minimise distance between each projected point $z_n$ and its cluster mean, say $\bc{\mu_-, \mu_+}$ and maximize distance between the projected means.
+\begin{equation}
+    \max \abs{\mu_- - \mu_+}
+\end{equation}
+\begin{equation}
+    \min \sum_{z_n:y_n=+1}{\abs{z_n - \mu_+}} + \sum_{z_n:y_n=-1}{\abs{z_n - \mu_-}}
+\end{equation}
+
+\noindent Thus the objective function is:
+\begin{equation}
+    J = \max\left[ \abs{\mu_- - \mu_+} - \sum_{z_n:y_n=+1}{\abs{z_n - \mu_+}} - \sum_{z_n:y_n=-1}{\abs{z_n - \mu_-}} \right]
+\end{equation}
+as all values are in $\mathop{\mathbb{R}}$ taking only simple absolute distance suffices.
 
 
 \end{mlsolution}
@@ -61,13 +75,84 @@ My solution to problem 4
 	
 \begin{mlsolution}
 
-My solution to problem 5
+    \begin{section}{Kernel Ridge Regression}
+        \begin{subsection}{Regularized Kernel Ridge Regression}
+            I calculated the output for the test-point by using Equation \ref{eq:kernel-ridge-1}.
+            \begin{equation}
+                \label{eq:kernel-ridge-1}
+                \vY^*=\vK^*(\vK-\lambda \vI_N)^{-1}\vY
+            \end{equation}
+            where $\vK*$ and $\vK$ are the kernel matrices: $\vK^*=k(x*,x_n)$, $\vK=k(x_m,x_n)$ and $k(x_m,x_n) = exp\left( -\gamma\abs{\abs{x_n - x_m}}^2 \right)$ is the rbf kernel function.
+            The RMSE value is calculated using: $$\sqrt{\frac{1}{N}||y_{true} - y_{pred}|| ^2}$$
+            \begin{figure}[h]
+                \includegraphics[width=\textwidth]{images/kernel-ridge-regression.pdf}
+                \caption{Kernel ridge regression with different regularizations}
+                \label{fig:kernel-rdge-regression}
+            \end{figure}
+            
+            From Figure \ref{fig:kernel-rdge-regression} we can see that as we increase the regularization hyperparameter $\lambda$ from $0.1$ to $100$ we see that the predictions are not able to accurately predict the noiseless y-values. Adding regularization makes the model resistant to noise and improves test-accuray, but in this case the y-values in test data are noiseless so it is better to overfit the model to reduce RMSE value.
+        \end{subsection}
+        \subsection{Landmark Kernel Ridge Regression}
+        Here I randomly chose $2$, $5$, $20$, $50$ and $100$ landmark points from train data and ran the same kernel ridge regression code on the test data. From Figure \ref{fig:landmark-kernel-rdge-regression} we can see that as the number of Landmark points increases the regression model starts to predict the model in a better way, the RMSE reduces.
+        \begin{figure}[h]
+            \includegraphics[width=\textwidth]{images/landmark-kernel-ridge-regression.pdf}
+            \caption{Landmark kernel ridge regression with different number of landmark points}
+            \label{fig:landmark-kernel-rdge-regression}
+        \end{figure}
+    \end{section}
 
-\end{mlsolution}
+    \begin{section}{K-Means Clustering}
 
-\begin{mlsolution}
+        In Figure \ref{fig:k-means-initial-plot} we see that the data is circular and there are 2 intuitive clusters that are possible. So I calculated the radius of each point by applying \ref{eq:angle-calc} and \ref{eq:radius-calc} and then projecting all the points on 1-dimension to get Figure \ref{fig:k-means-with-radius-projection} and applying k-means on the projected data to obtain Figure \ref{fig:k-means-clustered-with-radius-projection}
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=.3\textwidth]{images/k-means-initial-plot.pdf}
+            \caption{Scatter plot of data with initial centers highlighted}
+            \label{fig:k-means-initial-plot}
+        \end{figure}
 
-Solve this and if you can then give me 100
+        \begin{equation}
+            \label{eq:angle-calc}
+            \theta = tan^{-1}\left( \frac{y}{x} \right)
+        \end{equation}
+        \begin{equation}
+            \label{eq:radius-calc}
+            r = \frac{x}{cos(\theta)}
+        \end{equation}
+
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=.5\textwidth]{images/k-means-with-radius-projection.pdf}
+            \caption{Projecting data points into 1-dimension by taking radius of points from origin. Also highlighting the inital centers}
+            \label{fig:k-means-with-radius-projection}
+        \end{figure}
+
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=.5\textwidth]{images/k-means-clustered-with-radius-projection.pdf}
+            \caption{Clustering the data points based on radius and showing the position of the cluster centers on the 1-dimensional plot.}
+            \label{fig:k-means-clustered-with-radius-projection}
+        \end{figure}
+
+        Next I chose $1$ landmark point randomly and updated the cluster means accordingly, while using RBF kernel function. Then I ran a k-means prediction algorithm which led to the good and bad clustering. Figure \ref{fig:k-means-landmark} shows an example of the bad clustering that was obtained.
+
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=.5\textwidth]{images/k-means-landmark.pdf}
+            \caption{Applying k-means with 1 training landmark point. \textit{This is just one of the obtained clusters}}
+            \label{fig:k-means-landmark}
+        \end{figure}
+
+    \end{section}
+
+    \begin{section}{PCA and TSNE}
+        \begin{figure}[h]
+            \includegraphics[width=\textwidth]{images/pca-tsne.pdf}
+            \caption{2-Dimensional PCA and TSNE plots of MNIST}
+            \label{fig:pca-tsne}
+        \end{figure}
+        TSNE is able to make clusters which are naturally observable on 2 dimensions in a better way compared to PCA. In PCA, we can see significant overlap and mixing of points from different clusters. Thus, TSNE is a better projection technique to visualize high-dimensional data.
+    \end{section}
 
 \end{mlsolution}
 
