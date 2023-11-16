@@ -49,34 +49,69 @@ as all values are in $\mathop{\mathbb{R}}$ taking only simple absolute distance 
 
 \begin{mlsolution}
 
-Let us take $\vS^{\prime}=\frac{1}{N}\vX\vX^T$. \ref{eq:S-prime-eigenequation} represents the equation to calculate eigenvalue $\lambda^{\prime}$ and eigenvector $\vv$ of $\vS^{\prime}$
+\noindent Let us take $\vS^{\prime}=\frac{1}{N}\vX\vX^T$. Equation \ref{eq:S-prime-eigenequation} represents the equation to calculate eigenvalue $\lambda^{\prime}$ and eigenvector $\vv$ of $\vS^{\prime}$
 \begin{equation}
     \vS^{\prime} \vv = \lambda^{\prime} \vv
     \label{eq:S-prime-eigenequation}
 \end{equation}
 
-Now if we take the value of $\vS^{\prime}$ and pre-multiply with $\vX^T$ and readjust the values we get:
+\noindent Now if we take the value of $\vS^{\prime}$ and pre-multiply with $\vX^T$ and readjust the values we get:
 
 \begin{align}
     \frac{1}{N}\vX\vX^T\vv &= \lambda^{\prime} \vv \\
-    \red{\frac{1}{N}\vX^T\vX}\blue{\vX^T\vv} &= \lambda^{\prime} \blue{\vX^T \vv} \\
+    \red{\frac{1}{N}\vX^T\vX}\blue{\vX^T\vv} &= \lambda^{\prime} \blue{\vX^T \vv} \label{eq:Eigenvector-semi-final} \\
     \red{\vS} \blue{\vu} &= \lambda^{\prime} \blue{\vu}
+    \label{eq:Eigenvector-final}
 \end{align}
 
-Thus the eigenvalue remains the same in both forms, only the eigenvectors change, which can be see in blue from Equation 4 and 5. By computing eigenvectors this way we can reduce the complexity of calculating eigenvalues for a $D\times D$ matrix to $N\times N$ matrix, which is feasible in this case as $D<N$.
+\noindent Thus the eigenvalue remains the same in both forms, only the eigenvectors change, which can be seen in blue from Equation \ref{eq:Eigenvector-semi-final} and \ref{eq:Eigenvector-final}. By computing eigenvectors this way we can reduce the complexity of calculating eigenvalues for a $D\times D$ matrix to $N\times N$ matrix, which is feasible in this case as $D<N$.
 
 \end{mlsolution}
 
 \begin{mlsolution}
 
-My solution to problem 4
+\section*{Part 1}
+    In practical scenarios the input data need not be a part of a single distribution. By modelling with latent input variables $\vz_n$ we can leverage the fact that the input is coming from different distributions and so we can apply a combination of K different linear models to predict $y_n$ from $\vx_n$. This can also be useful in outlier detection as the outlier input point will be a part of its own cluster.
+\section*{Part 2}
+    The latent variable model is defined in Equation \ref{eq:basic-lvm-model}
+    \begin{equation}
+        \label{eq:basic-lvm-model}
+        p(\vz_n|\vx_n,\Theta) = \frac{p(\vz_n|\Theta)p(\vx_n|\vz_n,\Theta)}{p(\vx_n|\Theta)}
+    \end{equation}
+    Upon applying the variables and distributions from the question we get Equation \ref{eq:my-lvm-model}. Now that we only have to take MLE solution we can reduce the same to \ref{eq:my-lvm-mle-model}
+    \begin{align}
+        p(z_n=k|y_n,\Theta) &= \frac{p(z_n=k|\Theta)p(y_n|z_n=k,\Theta)}{p(y_n|\Theta)} \label{eq:my-lvm-model} \\
+        &= p(z_n=k|\Theta)p(y_n|z_n=k,\Theta) \label{eq:my-lvm-mle-model}
+    \end{align}
+    where:
+    \begin{align}
+        p(z_n=k|\Theta) &= \pi_k \\
+        p(y_n|z_n=k,\Theta) &= \mathop{\mathcal{N}}(w^T_{z_n}x_n, \beta^{-1})
+    \end{align}
+    Taking the log of equation \ref{eq:my-lvm-mle-model} with the provided distributions we get:
+    \begin{align}
+        \log{p(z_n=k|y_n,\Theta)} &= \log{\pi_k} + \log{\mathop{\mathcal{N}}(w^T_{z_n}x_n, \beta^{-1})}
+    \end{align}
+    \textbf{ALT-OPT ALGORITHM}
 
+    \noindent Step 1: Find the best $z_n$
+    \begin{align}
+        \hat{z_n} &= \argmax_{k=1,2,...,k} \log{\pi_k} + \log{\mathop{\mathcal{N}}(w^T_{z_n}x_n, \beta^{-1})}\\
+        &= \argmax_{k=1,2,...,k} \log{\pi_k} + \frac{\beta}{2}\br{y_n-w^T_{z_n}x_n}
+    \end{align}
+    Step 2: re-estimate the parameters
+    \begin{align}
+        \pi_k &= \frac{N_k}{N}\\
+        w_k &= (X^T_kX_k)^{-1}X^T_ky_k
+    \end{align}
+    Where $N_k$ is the number of points in cluster $k$
+    
 \end{mlsolution}
 	
 \begin{mlsolution}
 
-    \begin{section}{Kernel Ridge Regression}
-        \begin{subsection}{Regularized Kernel Ridge Regression}
+    \section{Kernel Ridge Regression}
+        \subsection{Regularized Kernel Ridge Regression}
             I calculated the output for the test-point by using Equation \ref{eq:kernel-ridge-1}.
             \begin{equation}
                 \label{eq:kernel-ridge-1}
@@ -91,7 +126,6 @@ My solution to problem 4
             \end{figure}
             
             From Figure \ref{fig:kernel-rdge-regression} we can see that as we increase the regularization hyperparameter $\lambda$ from $0.1$ to $100$ we see that the predictions are not able to accurately predict the noiseless y-values. Adding regularization makes the model resistant to noise and improves test-accuray, but in this case the y-values in test data are noiseless so it is better to overfit the model to reduce RMSE value.
-        \end{subsection}
         \subsection{Landmark Kernel Ridge Regression}
         Here I randomly chose $2$, $5$, $20$, $50$ and $100$ landmark points from train data and ran the same kernel ridge regression code on the test data. From Figure \ref{fig:landmark-kernel-rdge-regression} we can see that as the number of Landmark points increases the regression model starts to predict the model in a better way, the RMSE reduces.
         \begin{figure}[h]
@@ -99,9 +133,8 @@ My solution to problem 4
             \caption{Landmark kernel ridge regression with different number of landmark points}
             \label{fig:landmark-kernel-rdge-regression}
         \end{figure}
-    \end{section}
 
-    \begin{section}{K-Means Clustering}
+    \section{K-Means Clustering}
 
         In Figure \ref{fig:k-means-initial-plot} we see that the data is circular and there are 2 intuitive clusters that are possible. So I calculated the radius of each point by applying \ref{eq:angle-calc} and \ref{eq:radius-calc} and then projecting all the points on 1-dimension to get Figure \ref{fig:k-means-with-radius-projection} and applying k-means on the projected data to obtain Figure \ref{fig:k-means-clustered-with-radius-projection}
         \begin{figure}[h]
@@ -134,25 +167,22 @@ My solution to problem 4
             \label{fig:k-means-clustered-with-radius-projection}
         \end{figure}
 
-        Next I chose $1$ landmark point randomly and updated the cluster means accordingly, while using RBF kernel function. Then I ran a k-means prediction algorithm which led to the good and bad clustering. Figure \ref{fig:k-means-landmark} shows an example of the bad clustering that was obtained.
+        Next I chose $1$ landmark point randomly and added another feature based on RBF kernel function. Then I ran a k-means prediction algorithm which led to the good and bad clustering. Figure \ref{fig:k-means-landmark} shows all the clustered plots.
 
         \begin{figure}[h]
             \centering
-            \includegraphics[width=.5\textwidth]{images/k-means-landmark.pdf}
-            \caption{Applying k-means with 1 training landmark point. \textit{This is just one of the obtained clusters}}
+            \includegraphics[width=\textwidth]{images/k-means-landmark.pdf}
+            \caption{Applying k-means with 1 training landmark point.}
             \label{fig:k-means-landmark}
         \end{figure}
 
-    \end{section}
-
-    \begin{section}{PCA and TSNE}
+    \section{PCA and TSNE}
         \begin{figure}[h]
             \includegraphics[width=\textwidth]{images/pca-tsne.pdf}
             \caption{2-Dimensional PCA and TSNE plots of MNIST}
             \label{fig:pca-tsne}
         \end{figure}
         TSNE is able to make clusters which are naturally observable on 2 dimensions in a better way compared to PCA. In PCA, we can see significant overlap and mixing of points from different clusters. Thus, TSNE is a better projection technique to visualize high-dimensional data.
-    \end{section}
 
 \end{mlsolution}
 
